@@ -48,8 +48,8 @@ function handler(request, response) {
     var knownHosts = [
         'localhost:5000',
         'localhost',
-        'challengerpolls.herokuapp.com',
-        'http://challengerpolls.herokuapp.com/',
+        'lightmatter.herokuapp.com',
+        'http://lightmatter.herokuapp.com/',
     ];
 
     if (!_.includes(knownHosts, request.headers.host)) {
