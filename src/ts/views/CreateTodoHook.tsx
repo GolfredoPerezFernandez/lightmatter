@@ -343,10 +343,10 @@ export const CreateTodoHook = ({
   }
 
 
-  return <RX.View useSafeInsets={true} style={[_styles.container, Styles.statusBarTopMargin, {
+  return <RX.ScrollView style={[_styles.container, Styles.statusBarTopMargin, {
 
     backgroundColor: isTiny ? '#2A285F' : undefined,
-    justifyContent: 'center', alignItems: 'center',
+
     margin: 20,
     alignSelf: 'center',
     borderRadius: 12,
@@ -421,7 +421,7 @@ export const CreateTodoHook = ({
       </RX.View>
 
     </RX.View>
-  </RX.View>
+  </RX.ScrollView>
 
 }
 
