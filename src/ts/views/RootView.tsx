@@ -5,7 +5,6 @@
 * Top-level UI for the TodoList sample app.
 */
 
-import ImageSource from 'modules/images';
 import * as assert from 'assert';
 
 import * as _ from 'lodash';
@@ -24,7 +23,7 @@ import TopBarComposite from './TopBarComposite';
 import TopBarStack from './TopBarStack';
 import ViewTodoPanel from './ViewTodoPanel';
 import ResponsiveWidthStore from '../stores/ResponsiveWidthStore';
-import HomePanel from './HomePanel';
+import TodosStore from '../stores/TodosStore';
 
 interface RootViewProps extends RX.CommonProps {
     onLayout?: (e: RX.Types.ViewOnLayoutEvent) => void;
@@ -32,8 +31,11 @@ interface RootViewProps extends RX.CommonProps {
 
 interface RootViewState {
     viewTitle: string;
-    height: number;
     width: number;
+    imaginaryPartX: number[],
+    imaginaryPartY: number[],
+    height: number;
+    isTiny: boolean;
     navContext: NavModels.RootNavContext;
 }
 
@@ -41,7 +43,7 @@ const _styles = {
     root: RX.Styles.createViewStyle({
         flex: 1,
         alignSelf: 'stretch',
-        backgroundColor: Colors.contentBackground,
+        backgroundColor: Colors.white,
     }),
     stackViewBackground: RX.Styles.createViewStyle({
         flex: 1,
@@ -59,8 +61,11 @@ export default class RootView extends ComponentBase<RootViewProps, RootViewState
         const partialState: Partial<RootViewState> = {
             viewTitle: this._getViewTitle(newNavContext),
             navContext: newNavContext,
+            imaginaryPartX: TodosStore.getPartX(),
+            imaginaryPartY: TodosStore.getPartY(),
+            width: ResponsiveWidthStore.getWidth(),
             height: ResponsiveWidthStore.getHeight(),
-            width: ResponsiveWidthStore.getWidth()
+            isTiny: ResponsiveWidthStore.isSmallOrTinyScreenSize()
         };
 
         if (newNavContext.isStackNav) {
@@ -108,11 +113,9 @@ export default class RootView extends ComponentBase<RootViewProps, RootViewState
             const showBackButton = this._showBackButton(compositeContext.viewId);
             return (
                 <RX.View style={_styles.root} onLayout={this.props.onLayout}>
-                    <RX.Image style={{ flexDirection: 'column', justifyContent: 'center', alignItems: 'center', width: this.state.width, height: this.state.height }} resizeMethod={'scale'} resizeMode={'cover'} source={ImageSource.colorsBack}>
-                        <TopBarComposite showBackButton={showBackButton} onBack={this._onBack} />
-                        {this._renderMainView()}
-                    </RX.Image>
-                </RX.View >
+                    <TopBarComposite showBackButton={showBackButton} onBack={this._onBack} />
+                    {this._renderMainView()}
+                </RX.View>
             );
         }
     }
@@ -136,8 +139,7 @@ export default class RootView extends ComponentBase<RootViewProps, RootViewState
 
                 case NavModels.NavViewId.ViewTodo:
                     return 'Todo Details';
-                case NavModels.NavViewId.Home:
-                    return 'Home';
+
                 default:
                     assert.fail('Unknown view');
                     return '';
@@ -183,9 +185,7 @@ export default class RootView extends ComponentBase<RootViewProps, RootViewState
                 );
 
             case NavModels.NavViewId.NewTodo:
-                return <CreateTodoPanel />;
-            case NavModels.NavViewId.Home:
-                return <HomePanel />;
+                return <CreateTodoPanel imaginaryPartY={this.state.imaginaryPartY} imaginaryPartX={this.state.imaginaryPartX} isTiny={this.state.isTiny} height={this.state.height} width={this.state.width} />;
 
             case NavModels.NavViewId.ViewTodo:
                 const viewContext = this._findNavContextForRoute(viewId) as NavModels.ViewTodoViewNavContext;
@@ -195,7 +195,7 @@ export default class RootView extends ComponentBase<RootViewProps, RootViewState
                 return <ViewTodoPanel todoId={viewContext.todoId} />;
 
             default:
-                return <HomePanel />;;
+                return undefined;
         }
     }
 

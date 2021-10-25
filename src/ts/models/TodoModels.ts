@@ -5,27 +5,44 @@
 * Data models used with Todo sample app.
 */
 
-export interface Todo {
-    id: string;
-    creationTime: number;
-    closeTime: number;
-    duration: number;
-    title: string;
-    winning: string;
-    winner: string;
-    openPoll:boolean;
-    description: string;
-    totalVotes: number;
-    options:Options[];
-    _searchTerms: string;
+export interface Data{
+    x:number;
+    y:number;
 }
 
-export interface Options {
-    id: string;
-    creationTime: number;
-    title: string;
-    url: string;
-    votes: number;
-    votesPercent: string;
-    _searchTerms: string;
+export interface Todo {
+    id:string;
+    creationTime?: number;
+    _searchTerms?: string;    
+    title  : string;
+    imaginaryPartX: number[]  ;
+    imaginaryPartY :number[]  ;
+    dfImaginaryPartX: number[] ,
+    dfImaginaryPartY :number[] ;
+    dfRealPartX :number[]  ;
+    dfRealPartY: number[] ;
+    chisq:number;
+    lamdaLow: number;
+    lamdaHigh: number;
+    lamdaInit: number;
+    deltachi:number;
+    params:number[],
+    alpha:number[][]
+    tolerance:number;
+    absorbanceReal:Data[],
+    absorbanceImg:Data[],
+    reflectanceReal:Data[],
+    reflectanceImg:Data[],
+    transmissionReal:Data[],
+    transmissionImg:Data[],
+    dielectricFunctionImg:Data[],
+    dielectricFunctionReal:Data[],
+    conductivityReal:Data[],
+    conductivityImg:Data[],
+    impedanceReal:Data[],
+    impedanceImg:Data[],
+    difference:Data[];
+    refractionIndex:Data[],
+    extincionCoef:Data[],
+    type:string;
 }

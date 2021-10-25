@@ -107,6 +107,7 @@
         "synctasks": "^0.3.3",
         "three": "^0.129.0",
         "use-cloudinary": "^4.1.0",
-        "use-debounce": "^7.0.0"
+        "use-debounce": "^7.0.0",
+        "victory": "^36.0.1"
     }
 }

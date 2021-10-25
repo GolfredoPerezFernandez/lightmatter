@@ -41,14 +41,14 @@ const _styles = {
         flex: -1,
         fontSize: FontSizes.size16,
         font: Fonts.displayRegular,
-        color: '#00FF0A',
+        color: 'black',
         margin: 8,
     }),
     todoNameText: RX.Styles.createTextStyle({
         flex: -1,
         fontSize: FontSizes.size16,
         font: Fonts.displayRegular,
-        color: Colors.menuText2,
+        color: Colors.menuText,
         margin: 8,
     }),
     todoNameText2: RX.Styles.createTextStyle({
@@ -108,10 +108,6 @@ export default class TodoListItem extends ComponentBase<TodoListItemProps, TodoL
         } else if (isHovering) {
             buttonStyles.push(_styles.hovering);
         }
-        let openPoll: JSX.Element;
-        let id: JSX.Element;
-        let votes: JSX.Element;
-
         let nameText: JSX.Element;
         const searchString = this.props.searchString ? this.props.searchString.trim().toLowerCase() : '';
         let searchSubstrIndex = -1;
@@ -140,30 +136,10 @@ export default class TodoListItem extends ComponentBase<TodoListItemProps, TodoL
                 </RX.Text>
             );
         }
-        votes = (
-            <RX.Text style={this.props.isSelected ? _styles.todoNameText2 : _styles.todoNameText} numberOfLines={1}>
-                {this.props.todo.totalVotes}
-            </RX.Text>
-        );
-        id = (
-            <RX.Text style={this.props.isSelected ? _styles.todoNameText2 : _styles.todoNameText} numberOfLines={1}>
-                {this.props.todo.id}
-            </RX.Text>
-        );
-        openPoll = (
-            <RX.Text style={this.props.isSelected ? _styles.todoNameText2 : _styles.todoNameText3} numberOfLines={1}>
-                {this.props.todo.openPoll.toString()}
-            </RX.Text>
-        );
         return (
             <RX.View style={buttonStyles}>
                 <RX.View>
                     {nameText}
-                    {votes}
-                </RX.View>
-                <RX.View>
-                    {openPoll}
-                    {id}
                 </RX.View>
             </RX.View>
         );

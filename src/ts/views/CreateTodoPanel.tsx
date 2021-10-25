@@ -7,16 +7,21 @@
 
 import * as RX from 'reactxp';
 
-import NavContextStore from '../stores/NavContextStore';
-import SimpleButton from '../controls/SimpleButton';
 import { FontSizes, Styles } from '../app/Styles';
-import TodosStore from '../stores/TodosStore';
+import { CreateTodoHook } from './CreateTodoHook';
 
 interface CreateTodoPanelProps extends RX.CommonProps {
+    width: number;
+    height: number;
+    imaginaryPartX: number[],
+    imaginaryPartY: number[],
+    isTiny: boolean;
 }
 
 interface CreateTodoPanelState {
-    todoText?: string;
+    width: number;
+    height: number;
+    isTiny: boolean;
 }
 
 const _styles = {
@@ -42,44 +47,20 @@ const _styles = {
 };
 
 export default class CreateTodoPanel extends RX.Component<CreateTodoPanelProps, CreateTodoPanelState> {
+    protected _buildState(props: CreateTodoPanelProps, initState: boolean): Partial<CreateTodoPanelState> {
+        const partialState: Partial<CreateTodoPanelState> = {
+        };
+
+
+        return partialState;
+    }
     render() {
         return (
-            <RX.View useSafeInsets={ true } style={ [_styles.container, Styles.statusBarTopMargin] }>
-                <RX.TextInput
-                    style={ _styles.editTodoItem }
-                    value={ this.state ? this.state.todoText : '' }
-                    placeholder={ 'Enter todo' }
-                    onChangeText={ this._onChangeText }
-                    onSubmitEditing={ this._onSubmitText }
-                    accessibilityId={ 'EditTodoPanelTextInput' }
-                />
-
-                <RX.View style={ _styles.buttonContainer }>
-                    <SimpleButton text={ 'Save' } onPress={ this._onPressSave } disabled={ !!this.state && !this.state.todoText }/>
-                </RX.View>
+            <RX.View useSafeInsets={true} style={[_styles.container, Styles.statusBarTopMargin]}>
+                <CreateTodoHook isTiny={this.props.isTiny} width={this.props.width} height={this.props.height} />
             </RX.View>
         );
     }
 
-    private _onChangeText = (newText: string) => {
-        this.setState({ todoText: newText });
-    };
 
-    private _onSubmitText = () => {
-        this._saveTodo();
-    };
-
-    private _onPressSave = () => {
-        this._saveTodo();
-    };
-
-    private _saveTodo() {
-        if (!!this.state && this.state.todoText) {
-            const newTodo = TodosStore.addTodo(this.state.todoText);
-
-            this.setState({ todoText: '' });
-
-            NavContextStore.navigateToTodoList(NavContextStore.isUsingStackNav() ? undefined : newTodo.id);
-        }
-    }
 }

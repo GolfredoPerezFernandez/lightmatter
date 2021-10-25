@@ -79,7 +79,7 @@ const _styles = {
     label: RX.Styles.createTextStyle({
         font: Fonts.displayBold,
         fontSize: FontSizes.size12,
-        color: Colors.menuText2,
+        color: Colors.menuText,
     })
 };
 

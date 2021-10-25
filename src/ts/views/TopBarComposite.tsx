@@ -13,12 +13,8 @@ import { ComponentBase } from 'resub';
 import HoverButton from '../controls/HoverButton';
 import NavContextStore from '../stores/NavContextStore';
 import { Colors, Fonts, FontSizes } from '../app/Styles';
-import VerticalSeparator from '../controls/VerticalSeparator';
-
-import AccountMenuButton from './AccountMenuButton';
 import CurrentUserStore from '../stores/CurrentUserStore';
 
-import * as UI from '@sproutch/ui';
 
 const Moralis = require('moralis');
 Moralis.initialize("kVVoRWButUY31vShqdGGQmiya4L0n3kF5aRTUVXk");
@@ -52,7 +48,7 @@ const _styles = {
         font: Fonts.displaySemibold,
         fontSize: FontSizes.size20,
         marginHorizontal: 4,
-        color: Colors.logoColor,
+        color: 'black',
     }),
     linkText: RX.Styles.createTextStyle({
         font: Fonts.displayRegular,
@@ -75,7 +71,7 @@ const _styles = {
     label: RX.Styles.createTextStyle({
         font: Fonts.displayBold,
         fontSize: FontSizes.size12,
-        color: Colors.menuText2,
+        color: Colors.menuText,
     })
 };
 
@@ -110,7 +106,7 @@ export default class TopBarComposite extends ComponentBase<TopBarCompositeProps,
                     <RX.View style={_styles.logoContainer}>
                         <RX.Image source={ImageSource.todoLogo} style={_styles.logoImage} />
                         <RX.Text style={_styles.logoText}>
-                            {'Challenger Polls'}
+                            {'LightMatter'}
                         </RX.Text>
                     </RX.View>
                 </RX.Button>
@@ -118,23 +114,7 @@ export default class TopBarComposite extends ComponentBase<TopBarCompositeProps,
         }
         return (
             <RX.View style={_styles.background}>
-                {leftContents} {!this.state.isLogin ?
-                    <RX.View style={_styles.barControlsContainer}>
-
-                        <UI.Button onPress={this._onPressTodo} iconSlot={iconStyle => (
-                            <RX.Image source={ImageSource.metamask} style={{ marginTop: 0, alignSelf: 'center', marginRight: 5, width: 16, height: 16 }} />
-                        )} style={{ content: [{ width: 200, marginBottom: 5, borderRadius: 11, }], label: _styles.label }
-                        } elevation={4} variant={"outlined"} label="Log in with Metamask" />
-                    </RX.View> :
-
-                    <RX.View style={_styles.barControlsContainer}>
-
-                        <VerticalSeparator />
-                        <HoverButton onPress={this._onPressHelp} onRenderChild={this._onRenderHelpButton} />
-                        <VerticalSeparator />
-                        <AccountMenuButton />
-                    </RX.View>
-                }
+                {leftContents}
             </RX.View>
         );
     }
@@ -176,22 +156,4 @@ export default class TopBarComposite extends ComponentBase<TopBarCompositeProps,
         NavContextStore.navigateToTodoList('', false);
     };
 
-    private _onPressHelp = (e: RX.Types.SyntheticEvent) => {
-        e.stopPropagation();
-
-        RX.Linking.openUrl('https://www.bing.com/search?q=help');
-    };
-
-    private _onRenderHelpButton = (isHovering: boolean) => {
-        const textStyles = [_styles.linkText];
-        if (isHovering) {
-            textStyles.push(_styles.linkTextHover);
-        }
-
-        return (
-            <RX.Text style={textStyles}>
-                {'Help'}
-            </RX.Text>
-        );
-    };
 }

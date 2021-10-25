@@ -15,6 +15,8 @@ import CreateTodoPanel from './CreateTodoPanel';
 import TodoListPanel from './TodoListPanel';
 import ViewTodoPanel from './ViewTodoPanel';
 import HomePanel from './HomePanel';
+import ResponsiveWidthStore from '../stores/ResponsiveWidthStore';
+import TodosStore from '../stores/TodosStore';
 
 export interface TodoCompositeViewProps extends RX.CommonProps {
     navContext: NavModels.TodoRootNavContext;
@@ -22,6 +24,12 @@ export interface TodoCompositeViewProps extends RX.CommonProps {
 
 
 interface TodoCompositeViewState {
+
+    width: number,
+    isTiny: boolean,
+    imaginaryPartX: number[],
+    imaginaryPartY: number[],
+    height: number,
 }
 
 const _styles = {
@@ -42,7 +50,15 @@ const _styles = {
 
 export default class TodoCompositeView extends ComponentBase<TodoCompositeViewProps, TodoCompositeViewState> {
     protected _buildState(props: TodoCompositeViewProps, initState: boolean): Partial<TodoCompositeViewState> | undefined {
-        return undefined;
+        const partialState: Partial<TodoCompositeViewState> = {
+            width: ResponsiveWidthStore.getWidth(),
+            height: ResponsiveWidthStore.getHeight(),
+            isTiny: ResponsiveWidthStore.isSmallOrTinyScreenSize(),
+
+            imaginaryPartX: TodosStore.getPartX(),
+            imaginaryPartY: TodosStore.getPartY(),
+        };
+        return partialState;
     }
 
     render(): JSX.Element | null {
@@ -65,7 +81,7 @@ export default class TodoCompositeView extends ComponentBase<TodoCompositeViewPr
     private _renderRightPanel() {
         if (this.props.navContext.showNewTodoPanel) {
             return (
-                <CreateTodoPanel />
+                <CreateTodoPanel imaginaryPartY={this.state.imaginaryPartY} imaginaryPartX={this.state.imaginaryPartX} isTiny={this.state.isTiny} height={this.state.height} width={this.state.width} />
             );
         } else if (this.props.navContext.todoList.selectedTodoId) {
             return (
