@@ -350,7 +350,7 @@ export const CreateTodoHook = ({
     margin: 20,
     alignSelf: 'center',
     borderRadius: 12,
-    flexDirection: isTiny ? 'column' : 'row'
+    flexDirection: 'row'
   }]}>
 
 
