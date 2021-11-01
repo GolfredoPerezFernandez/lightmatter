@@ -80,7 +80,7 @@
         "eslint-plugin-react": "^7.20.3",
         "get-user-locale": "^1.4.0",
         "gulp-eslint": "^6.0.0",
-        "moralis": "0.0.59",
+        "moralis": "0.0.112",
         "nosqlprovider": "^0.6.23",
         "react": "^16.13.1",
         "react-audio-player": "^0.17.0",

@@ -94,7 +94,6 @@ constructor(partY:any,partX:any,a?:number[],iterMax?:number,NDone?:number,gridTy
             this.w=partX
             this.ndat=partY.length
         }
-
         if(gridType!==undefined){
           
         this.gridType=gridType
@@ -218,7 +217,8 @@ constructor(partY:any,partX:any,a?:number[],iterMax?:number,NDone?:number,gridTy
         } 
    }
         this.mrqconf1() ////////Inicializacion
-        
+ 
+
          for(j=0;j<this.ma;j++){ //copía parametros
             this.atry[j]=this.a[j]
           }
@@ -244,16 +244,17 @@ constructor(partY:any,partX:any,a?:number[],iterMax?:number,NDone?:number,gridTy
 
                     this.oneda[j][0]=this.beta[j] //copian beta a oneda  
               }
-
-              this.gaussj();     // resuelven temp y oneda //alpha * delta = beta
-
+  
+              
+               this.gaussj();     // resuelven temp y oneda //alpha * delta = beta
+               
+               
               for(let j=0;j<this.mfit;j++){
                 for(let k=0;k<this.mfit;k++){
                    this.covar[j][k]=this.temp[j][k]
                 }
                    this.da[j]=this.oneda[j][0]
               }
-
         
               if(done===this.NDONE){          
                 this.covsrtCovar(); 
@@ -265,9 +266,11 @@ constructor(partY:any,partX:any,a?:number[],iterMax?:number,NDone?:number,gridTy
                     if(this.ia[l]){
                       this.atry[l]=this.a[l]+this.da[j++]
                     }
-               }               
+               }        
+               
                this.mrqconf2();
 
+           
                if(Math.abs(this.chisq-this.ochisq)<Math.max(this.tol,this.tol*this.chisq)){
                      done++;
                }
@@ -404,9 +407,11 @@ constructor(partY:any,partX:any,a?:number[],iterMax?:number,NDone?:number,gridTy
               this.sig2i=1.0/(this.sig[i]*this.sig[i])///sigma*22
                 
               dy=this.y[i]-this.ymod;
+              
               for( j=0, l=0;l<this.ma;l++){
                     if(this.ia[l]){
                           wt=this.dyda[l]*this.sig2i;
+                          
                           for(k=0, m=0;m<l+1;m++){
                               if(this.ia[m]){  
                                   this.alpha[j][k++] += wt*this.dyda[m]
@@ -414,11 +419,12 @@ constructor(partY:any,partX:any,a?:number[],iterMax?:number,NDone?:number,gridTy
                               }
                           }
                           this.beta[j++] += dy*wt;
+                       
                       }
                 }
                 this.chisq +=dy*dy*this.sig2i;
               }
-          
+           
               for( j=1;j<this.mfit;j++){
                 for( k=0;k<j;k++){
                   this.alpha[k][j]=this.alpha[j][k]
@@ -431,7 +437,6 @@ constructor(partY:any,partX:any,a?:number[],iterMax?:number,NDone?:number,gridTy
                 let i;
                 this.ymod=0;
                 let na=this.a.length
-
                 for(i=0;i<na; i++){
                 
                   this.ymod+=this.a[i]*this.xi
@@ -486,8 +491,9 @@ constructor(partY:any,partX:any,a?:number[],iterMax?:number,NDone?:number,gridTy
             this.chisq=0;
             
             for(let i=0;i<this.ndat;i++){
-                this.xi=this.x[i]
+                this.xi=this.x[i];  
                 this.funcs2();
+                
                 this.sig2i=1.0/(this.sig[i]*this.sig[i])///sigma*2 
                 dy=this.y[i]-this.ymod;
 
@@ -503,24 +509,29 @@ constructor(partY:any,partX:any,a?:number[],iterMax?:number,NDone?:number,gridTy
                         }
                 }
                 this.chisq += dy*dy*this.sig2i;        
-              }
-
+              } 
+              
             for(let j=1;j<this.mfit;j++){    
                   for(let k=0;k<j;k++){
 
                     this.covar[k][j]=this.covar[j][k]
                   }
             }   
+            
         };
 
       funcs2(){
           let i;
           let na=this.atry.length;
           this.ymod=0;
+          
           for(i=0;i<na; i++){
             this.ymod+=this.atry[i]*this.xi
                 this.dyda[i]=this.x[i]
+                
             }
+             
+            
       };
 
       hold(i:number, val:number){

@@ -2,6 +2,10 @@
 import { Fonts, FontSizes, Styles } from '../app/Styles';
 
 
+const Moralis = require('moralis');
+const serverUrl = "https://n1okaz6oc6ll.usemoralis.com:2053/server";
+const appId = "JhbKsNufIu2Vf3647buN0jVSiAUiDOJyYGk6hwWd";
+Moralis.start({ serverUrl, appId });
 
 const _styles = {
   container: RX.Styles.createViewStyle({
@@ -85,6 +89,7 @@ export const CreateTodoHook = ({
   isTiny: boolean
 }) => {
   var [title, setTitle] = useState('')
+  var [cargando, setCargando] = useState(false)
   var [cargado, setCargado] = useState(false)
   var [changed, setChanged] = useState(false)
   var [data, setData] = useState<any[]>([])
@@ -160,89 +165,219 @@ export const CreateTodoHook = ({
 
     RX.Modal.show(dialog, _confirmDeleteDialogId);
   };
-  function _onPressSave() {
-
+  async function _onPressSave() {
+    setCargando(true)
     if (imaginaryPartX.length > 0 && imaginaryPartY.length > 0) {
 
-      let result = new LM(imaginaryPartY, imaginaryPartX, undefined, 5, undefined, undefined, undefined, undefined, undefined, undefined).fit();
+      let result = await Moralis.Cloud.run('LM', { partY: imaginaryPartY, partX: imaginaryPartX, a: undefined, iterMax: 1, NDone: 1, gridType: undefined, tol: undefined, lamdaInit: undefined, lamdaLow: undefined, lamdaHigh: undefined })
+      console.log(result)
+      if (result) {
+        let absorbanceReal = []
+        for (let i = 0; i < result.dfImaginaryPartX.length; i++) {
+          absorbanceReal.push({ x: imaginaryPartX[i], y: imaginaryPartY[i] })
 
-      console.log('1')
+        }
+        let absorbanceImg = []
+        for (let i = 0; i < result.dfImaginaryPartX.length; i++) {
+          absorbanceImg.push({ x: imaginaryPartX[i], y: imaginaryPartY[i] })
+
+        }
+        let reflectanceReal = []
+        for (let i = 0; i < result.dfImaginaryPartX.length; i++) {
+          reflectanceReal.push({ x: result.dfRealPartX[i], y: result.dfRealPartY[i] })
+        }
+
+        let reflectanceImg = []
+        for (let i = 0; i < result.dfImaginaryPartX.length; i++) {
+          reflectanceImg.push({ x: result.dfRealPartX[i], y: result.dfImaginaryPartY[i] })
+        }
+        let transmissionReal = []
+        for (let i = 0; i < result.dfImaginaryPartX.length; i++) {
+          transmissionReal.push({ x: result.dfRealPartX[i], y: (1 - result.dfRealPartY[i]) })
+
+        }
+        let transmissionImg = []
+        for (let i = 0; i < result?.dfImaginaryPartY.length; i++) {
+          transmissionImg.push({ x: result.imaginaryPartX[i], y: (1 - result.dfImaginaryPartY[i]) })
+
+        }
+        let arr7 = []
+        for (let i = 0; i < result.difference.length; i++) {
+          arr7.push({ x: result?.imaginaryPartX[i], y: result.difference[i] })
+
+        }
+        let dielectricFunctionImg = []
+
+        for (let i = 0; i < result.dfImaginaryPartY.length; i++) {
+          dielectricFunctionImg.push({ x: imaginaryPartX[i], y: ((4 * Math.sqrt(result.dfImaginaryPartY[i]) * (1 - result.dfImaginaryPartY[i] * Math.sin(result.dfRealPartY[i]))) / (Math.pow(1 + result.dfImaginaryPartY[i] - 2 * Math.sqrt(result.dfImaginaryPartY[i]) * Math.cos(result.dfRealPartY[i]), 2))) })
+
+        }
+        let dielectricFunctionReal = []
+
+        for (let i = 0; i < result.dfImaginaryPartY.length; i++) {
+          dielectricFunctionReal.push({ x: imaginaryPartX[i], y: (((4 * Math.sqrt(result.dfImaginaryPartY[i]) * (1 - result.dfImaginaryPartY[i]) * Math.pow(Math.sin(result.dfRealPartY[i]), 2))) / (Math.pow(1 + result.dfImaginaryPartY[i] - 2 * Math.sqrt(result.dfImaginaryPartY[i]) * Math.cos(result.dfRealPartY[i]), 2))) })
+
+        }
+
+        let conductivityImg = []
+
+        for (let i = 0; i < result.dfImaginaryPartY.length; i++) {
+          conductivityImg.push({ x: imaginaryPartX[i], y: (result.imaginaryPartX[i] / (4 * Math.PI)) * (4 * Math.sqrt(result.dfImaginaryPartY[i]) * (1 - result.dfImaginaryPartY[i] * Math.sin(result.dfRealPartY[i]))) / (Math.pow(1 + result.dfImaginaryPartY[i] - 2 * Math.sqrt(result.dfImaginaryPartY[i]) * Math.cos(result.dfRealPartY[i]), 2)) })
+        }
+        let conductivityReal = []
+
+        for (let i = 0; i < result.dfImaginaryPartY.length; i++) {
+          conductivityReal.push({ x: imaginaryPartX[i], y: (result.imaginaryPartX[i] / (4 * Math.PI)) * (4 * Math.sqrt(result.dfImaginaryPartY[i]) * (1 - result.dfImaginaryPartY[i]) * Math.pow(Math.sin(result.dfRealPartY[i]), 2)) / (Math.pow(1 + result.dfImaginaryPartY[i] - 2 * Math.sqrt(result.dfImaginaryPartY[i]) * Math.cos(result.dfRealPartY[i]), 2)) })
+        }
+        let refractionIndex = []
+
+        for (let i = 0; i < result.dfImaginaryPartY.length; i++) {
+          refractionIndex.push({ x: imaginaryPartX[i], y: Math.sqrt((((4 * Math.sqrt(result.dfImaginaryPartY[i]) * (1 - result.dfImaginaryPartY[i]) * Math.pow(Math.sin(result.dfRealPartY[i]), 2))) / (Math.pow(1 + result.dfImaginaryPartY[i] - 2 * Math.sqrt(result.dfImaginaryPartY[i]) * Math.cos(result.dfRealPartY[i]), 2)))) })
+        }
+        let exticionCoef = []
+
+        for (let i = 0; i < result.dfImaginaryPartY.length; i++) {
+          exticionCoef.push({ x: imaginaryPartX[i], y: ((4 * Math.sqrt(result.dfImaginaryPartY[i]) * (1 - result.dfImaginaryPartY[i] * Math.sin(result.dfRealPartY[i]))) / (Math.pow(1 + result.dfImaginaryPartY[i] - 2 * Math.sqrt(result.dfImaginaryPartY[i]) * Math.cos(result.dfRealPartY[i]), 2)) / (2 * Math.sqrt((((4 * Math.sqrt(result.dfImaginaryPartY[i]) * (1 - result.dfImaginaryPartY[i]) * Math.pow(Math.sin(result.dfRealPartY[i]), 2))) / (Math.pow(1 + result.dfImaginaryPartY[i] - 2 * Math.sqrt(result.dfImaginaryPartY[i]) * Math.cos(result.dfRealPartY[i]), 2)))))) })
+        }
+        let ImpedanceImg = []
+
+        for (let i = 0; i < result.dfImaginaryPartY.length; i++) {
+          ImpedanceImg.push({ x: imaginaryPartX[i], y: (2 * Math.PI * result.dfImaginaryPartX[i]) })
+        }
+        let ImpedanceReal = []
+
+        for (let i = 0; i < result.dfImaginaryPartY.length; i++) {
+          ImpedanceReal.push({ x: imaginaryPartX[i], y: (2 * Math.PI * result.dfImaginaryPartX[i]) })
+        }
+
+        const now = Date.now().valueOf();
+        let newTodo: Todo = {
+          id: now.toString(),
+          title: title,
+          dfRealPartX: [...result.dfRealPartX],
+          dfRealPartY: [...result.dfRealPartY],
+          dfImaginaryPartX: [...result.dfImaginaryPartX],
+          dfImaginaryPartY: [...result.dfImaginaryPartY],
+          imaginaryPartX: imaginaryPartX,
+          imaginaryPartY: imaginaryPartY,
+          creationTime: now,
+          chisq: result.chisq,
+          lamdaLow: result.lamdaLow,
+          lamdaHigh: result.lamdaHigh,
+          lamdaInit: result.lamdaInit,
+          deltachi: result.deltachi,
+          tolerance: result.tolerance,
+          alpha: result.alpha,
+          params: result.params,
+          absorbanceReal: [...absorbanceReal],
+          absorbanceImg: [...absorbanceImg],
+          reflectanceReal: [...reflectanceReal],
+          reflectanceImg: [...reflectanceImg],
+          transmissionReal: [...transmissionReal],
+          transmissionImg: [...transmissionImg],
+          difference: [...arr7],
+          type: TodosStore.getType(),
+          dielectricFunctionImg: [...dielectricFunctionImg],
+          dielectricFunctionReal: [...dielectricFunctionReal],
+          conductivityReal: [...conductivityReal],
+          conductivityImg: [...conductivityImg],
+          impedanceReal: [...ImpedanceReal],
+          impedanceImg: [...ImpedanceImg],
+          refractionIndex: [...refractionIndex],
+          extincionCoef: [...exticionCoef]
+        };
+
+
+        TodosStore.addTodo(newTodo);
+        setCargando(false)
+
+        NavContextStore.navigateToTodoList(newTodo.id)
+      }
+    }
+  }
+
+  async function _onPressSave2() {
+    setCargando(true)
+    if (imaginaryPartX.length > 0 && imaginaryPartY.length > 0) {
+
+      let result = new LM(imaginaryPartY, imaginaryPartX, undefined, 1, 1, undefined, undefined, undefined, undefined, undefined).fit();
+
 
       let absorbanceReal = []
-      for (let i = 0; i < result?.dfImaginaryPartX.length; i++) {
+      for (let i = 0; i < result.dfImaginaryPartX.length; i++) {
         absorbanceReal.push({ x: imaginaryPartX[i], y: imaginaryPartY[i] })
 
       }
       let absorbanceImg = []
-      for (let i = 0; i < result?.dfImaginaryPartX.length; i++) {
+      for (let i = 0; i < result.dfImaginaryPartX.length; i++) {
         absorbanceImg.push({ x: imaginaryPartX[i], y: imaginaryPartY[i] })
 
       }
       let reflectanceReal = []
-      for (let i = 0; i < result?.dfImaginaryPartX.length; i++) {
-        reflectanceReal.push({ x: result?.dfRealPartX[i], y: result?.dfRealPartY[i] })
+      for (let i = 0; i < result.dfImaginaryPartX.length; i++) {
+        reflectanceReal.push({ x: result.dfRealPartX[i], y: result.dfRealPartY[i] })
       }
 
       let reflectanceImg = []
-      for (let i = 0; i < result?.dfImaginaryPartX.length; i++) {
-        reflectanceImg.push({ x: result?.dfRealPartX[i], y: result?.dfImaginaryPartY[i] })
+      for (let i = 0; i < result.dfImaginaryPartX.length; i++) {
+        reflectanceImg.push({ x: result.dfRealPartX[i], y: result.dfImaginaryPartY[i] })
       }
       let transmissionReal = []
-      for (let i = 0; i < result?.dfImaginaryPartX.length; i++) {
-        transmissionReal.push({ x: result?.dfRealPartX[i], y: (1 - result?.dfRealPartY[i]) })
+      for (let i = 0; i < result.dfImaginaryPartX.length; i++) {
+        transmissionReal.push({ x: result.dfRealPartX[i], y: (1 - result.dfRealPartY[i]) })
 
       }
       let transmissionImg = []
       for (let i = 0; i < result?.dfImaginaryPartY.length; i++) {
-        transmissionImg.push({ x: result?.imaginaryPartX[i], y: (1 - result?.dfImaginaryPartY[i]) })
+        transmissionImg.push({ x: result.imaginaryPartX[i], y: (1 - result.dfImaginaryPartY[i]) })
 
       }
       let arr7 = []
-      for (let i = 0; i < result?.difference.length; i++) {
-        arr7.push({ x: result?.imaginaryPartX[i], y: result?.difference[i] })
+      for (let i = 0; i < result.difference.length; i++) {
+        arr7.push({ x: result?.imaginaryPartX[i], y: result.difference[i] })
 
       }
       let dielectricFunctionImg = []
 
-      for (let i = 0; i < result?.dfImaginaryPartY.length; i++) {
+      for (let i = 0; i < result.dfImaginaryPartY.length; i++) {
         dielectricFunctionImg.push({ x: imaginaryPartX[i], y: ((4 * Math.sqrt(result.dfImaginaryPartY[i]) * (1 - result.dfImaginaryPartY[i] * Math.sin(result.dfRealPartY[i]))) / (Math.pow(1 + result.dfImaginaryPartY[i] - 2 * Math.sqrt(result.dfImaginaryPartY[i]) * Math.cos(result.dfRealPartY[i]), 2))) })
 
       }
       let dielectricFunctionReal = []
 
-      for (let i = 0; i < result?.dfImaginaryPartY.length; i++) {
+      for (let i = 0; i < result.dfImaginaryPartY.length; i++) {
         dielectricFunctionReal.push({ x: imaginaryPartX[i], y: (((4 * Math.sqrt(result.dfImaginaryPartY[i]) * (1 - result.dfImaginaryPartY[i]) * Math.pow(Math.sin(result.dfRealPartY[i]), 2))) / (Math.pow(1 + result.dfImaginaryPartY[i] - 2 * Math.sqrt(result.dfImaginaryPartY[i]) * Math.cos(result.dfRealPartY[i]), 2))) })
 
       }
 
       let conductivityImg = []
 
-      for (let i = 0; i < result?.dfImaginaryPartY.length; i++) {
+      for (let i = 0; i < result.dfImaginaryPartY.length; i++) {
         conductivityImg.push({ x: imaginaryPartX[i], y: (result.imaginaryPartX[i] / (4 * Math.PI)) * (4 * Math.sqrt(result.dfImaginaryPartY[i]) * (1 - result.dfImaginaryPartY[i] * Math.sin(result.dfRealPartY[i]))) / (Math.pow(1 + result.dfImaginaryPartY[i] - 2 * Math.sqrt(result.dfImaginaryPartY[i]) * Math.cos(result.dfRealPartY[i]), 2)) })
       }
       let conductivityReal = []
 
-      for (let i = 0; i < result?.dfImaginaryPartY.length; i++) {
+      for (let i = 0; i < result.dfImaginaryPartY.length; i++) {
         conductivityReal.push({ x: imaginaryPartX[i], y: (result.imaginaryPartX[i] / (4 * Math.PI)) * (4 * Math.sqrt(result.dfImaginaryPartY[i]) * (1 - result.dfImaginaryPartY[i]) * Math.pow(Math.sin(result.dfRealPartY[i]), 2)) / (Math.pow(1 + result.dfImaginaryPartY[i] - 2 * Math.sqrt(result.dfImaginaryPartY[i]) * Math.cos(result.dfRealPartY[i]), 2)) })
       }
       let refractionIndex = []
 
-      for (let i = 0; i < result?.dfImaginaryPartY.length; i++) {
+      for (let i = 0; i < result.dfImaginaryPartY.length; i++) {
         refractionIndex.push({ x: imaginaryPartX[i], y: Math.sqrt((((4 * Math.sqrt(result.dfImaginaryPartY[i]) * (1 - result.dfImaginaryPartY[i]) * Math.pow(Math.sin(result.dfRealPartY[i]), 2))) / (Math.pow(1 + result.dfImaginaryPartY[i] - 2 * Math.sqrt(result.dfImaginaryPartY[i]) * Math.cos(result.dfRealPartY[i]), 2)))) })
       }
       let exticionCoef = []
 
-      for (let i = 0; i < result?.dfImaginaryPartY.length; i++) {
+      for (let i = 0; i < result.dfImaginaryPartY.length; i++) {
         exticionCoef.push({ x: imaginaryPartX[i], y: ((4 * Math.sqrt(result.dfImaginaryPartY[i]) * (1 - result.dfImaginaryPartY[i] * Math.sin(result.dfRealPartY[i]))) / (Math.pow(1 + result.dfImaginaryPartY[i] - 2 * Math.sqrt(result.dfImaginaryPartY[i]) * Math.cos(result.dfRealPartY[i]), 2)) / (2 * Math.sqrt((((4 * Math.sqrt(result.dfImaginaryPartY[i]) * (1 - result.dfImaginaryPartY[i]) * Math.pow(Math.sin(result.dfRealPartY[i]), 2))) / (Math.pow(1 + result.dfImaginaryPartY[i] - 2 * Math.sqrt(result.dfImaginaryPartY[i]) * Math.cos(result.dfRealPartY[i]), 2)))))) })
       }
       let ImpedanceImg = []
 
-      for (let i = 0; i < result?.dfImaginaryPartY.length; i++) {
+      for (let i = 0; i < result.dfImaginaryPartY.length; i++) {
         ImpedanceImg.push({ x: imaginaryPartX[i], y: (2 * Math.PI * result.dfImaginaryPartX[i]) })
       }
       let ImpedanceReal = []
 
-      for (let i = 0; i < result?.dfImaginaryPartY.length; i++) {
+      for (let i = 0; i < result.dfImaginaryPartY.length; i++) {
         ImpedanceReal.push({ x: imaginaryPartX[i], y: (2 * Math.PI * result.dfImaginaryPartX[i]) })
       }
 
@@ -250,10 +385,10 @@ export const CreateTodoHook = ({
       let newTodo: Todo = {
         id: now.toString(),
         title: title,
-        dfRealPartX: [...result?.dfRealPartX],
-        dfRealPartY: [...result?.dfRealPartY],
-        dfImaginaryPartX: [...result?.dfImaginaryPartX],
-        dfImaginaryPartY: [...result?.dfImaginaryPartY],
+        dfRealPartX: [...result.dfRealPartX],
+        dfRealPartY: [...result.dfRealPartY],
+        dfImaginaryPartX: [...result.dfImaginaryPartX],
+        dfImaginaryPartY: [...result.dfImaginaryPartY],
         imaginaryPartX: imaginaryPartX,
         imaginaryPartY: imaginaryPartY,
         creationTime: now,
@@ -285,6 +420,8 @@ export const CreateTodoHook = ({
 
 
       TodosStore.addTodo(newTodo);
+      setCargando(false)
+
       NavContextStore.navigateToTodoList(newTodo.id)
     }
   }
@@ -343,7 +480,7 @@ export const CreateTodoHook = ({
   }
 
 
-  return <RX.ScrollView style={[_styles.container, Styles.statusBarTopMargin, {
+  return <RX.View style={[_styles.container, Styles.statusBarTopMargin, {
 
     backgroundColor: isTiny ? '#2A285F' : undefined,
 
@@ -391,7 +528,7 @@ export const CreateTodoHook = ({
           </Dropzone>
         </RX.View>
       }</RX.View>
-    <RX.View style={{ flex: 1, borderRadius: 12, marginBottom: 20, marginTop: 40, padding: 16, flexDirection: isTiny ? 'column' : 'row', alignItems: 'center', justifyContent: 'center' }}>
+    <RX.View style={{ flex: 1, borderRadius: 12, marginBottom: 20, marginTop: 40, padding: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
 
 
       <RX.View style={{ width: isTiny ? width * 0.9 : undefined, backgroundColor: '#2A285F', flexDirection: 'column', padding: isTiny ? 0 : 40, height: isTiny ? height * 0.60 : undefined, alignItems: isTiny ? 'center' : 'flex-start', justifyContent: isTiny ? 'center' : 'flex-start' }}>
@@ -399,6 +536,10 @@ export const CreateTodoHook = ({
 
         <RX.Text style={[_styles.text2, { alignSelf: isTiny ? 'flex-start' : 'flex-start', marginTop: isTiny ? 8 : 12, marginBottom: isTiny ? 5 : 10, marginLeft: isTiny ? width * 0.10 : undefined }]} >
           {'Material name'}
+        </RX.Text>
+
+        <RX.Text style={[_styles.text2, { alignSelf: isTiny ? 'flex-start' : 'flex-start', marginTop: isTiny ? 8 : 12, marginBottom: isTiny ? 5 : 10, marginLeft: isTiny ? width * 0.10 : undefined }]} >
+          {'data points ' + imaginaryPartY.length}
         </RX.Text>
         <RX.TextInput onChangeText={setTitle}
           accessibilityId={'EditTodoPanelTextInput'}
@@ -413,7 +554,12 @@ export const CreateTodoHook = ({
 
 
         <RX.View style={_styles.buttonContainer}>
-          <SimpleButton disabled={(imaginaryPartY === [] ? true : false || changed || title === undefined ? true : false)} onPress={_onPressSave} text={'Analizar'} textStyle={_styles.text3} buttonStyle={{ borderWidth: 0, marginTop: isTiny ? 10 : 20, borderRadius: 11.48, backgroundColor: '#343261', width: isTiny ? width * 0.60 : width * 0.24, height: isTiny ? 37 : 47, justifyContent: 'center', alignItems: 'center' }} />
+          {cargando === false ? <SimpleButton disabled={(imaginaryPartY === [] ? true : false || changed || title === undefined ? true : false)} onPress={_onPressSave} text={'Analizar'} textStyle={_styles.text3} buttonStyle={{ borderWidth: 0, marginTop: isTiny ? 10 : 20, borderRadius: 11.48, backgroundColor: '#343261', width: isTiny ? width * 0.60 : width * 0.24, height: isTiny ? 37 : 47, justifyContent: 'center', alignItems: 'center' }} />
+            : null
+          }
+          {cargando === false ? <SimpleButton disabled={(imaginaryPartY === [] ? true : false || changed || title === undefined ? true : false)} onPress={_onPressSave2} text={'Analizar Yo'} textStyle={_styles.text3} buttonStyle={{ borderWidth: 0, marginTop: isTiny ? 10 : 20, borderRadius: 11.48, backgroundColor: '#343261', width: isTiny ? width * 0.60 : width * 0.24, height: isTiny ? 37 : 47, justifyContent: 'center', alignItems: 'center' }} />
+            : null
+          }
 
           <SimpleButton onPress={_onPressConfiguration} text={'Change Configuration'} textStyle={_styles.text3} buttonStyle={{ borderWidth: 0, marginTop: isTiny ? 10 : 20, borderRadius: 11.48, backgroundColor: '#343261', width: isTiny ? width * 0.60 : width * 0.24, height: isTiny ? 37 : 47, justifyContent: 'center', alignItems: 'center' }} />
 
@@ -421,7 +567,7 @@ export const CreateTodoHook = ({
       </RX.View>
 
     </RX.View>
-  </RX.ScrollView>
+  </RX.View>
 
 }
 
