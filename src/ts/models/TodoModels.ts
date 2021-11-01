@@ -41,7 +41,7 @@ export interface Todo {
     conductivityImg:Data[],
     impedanceReal:Data[],
     impedanceImg:Data[],
-    difference:Data[];
+    difference:number[];
     refractionIndex:Data[],
     extincionCoef:Data[],
     type:string;

@@ -6,7 +6,9 @@
         "noResolve": false,
         "jsx": "react",
         "reactNamespace": "RX",
-        "module": "commonjs",
+        "module": "commonjs",       
+         "moduleResolution": "node",
+
         "target": "es5",
         "experimentalDecorators": true,
         "sourceMap": true,

@@ -7,6 +7,8 @@ const serverUrl = "https://n1okaz6oc6ll.usemoralis.com:2053/server";
 const appId = "JhbKsNufIu2Vf3647buN0jVSiAUiDOJyYGk6hwWd";
 Moralis.start({ serverUrl, appId });
 
+import { Line } from 'react-chartjs-2';
+
 const _styles = {
   container: RX.Styles.createViewStyle({
     flex: 1,
@@ -34,9 +36,9 @@ const _styles = {
     backgroundColor: "#eee"
   }),
   chart: RX.Styles.createViewStyle({
-    backgroundColor: "#19173E",
-    width: 200,
+    backgroundColor: "white",
     justifyContent: 'center',
+    alignSelf: 'stretch',
     alignItems: 'center'
   }),
   text1: RX.Styles.createTextStyle({
@@ -46,7 +48,7 @@ const _styles = {
   text2: RX.Styles.createTextStyle({
     font: Fonts.displayBold,
     fontSize: 13,
-    color: 'white',
+    color: 'black',
   }),
   text3: RX.Styles.createTextStyle({
     font: Fonts.displayBold,
@@ -60,16 +62,10 @@ const _styles = {
   }),
 };
 
-import {
-  VictoryChart,
-  VictoryZoomContainer,
-  VictoryLine,
-  VictoryTheme,
-} from 'victory';
 
 import Dropzone from 'react-dropzone';
 import * as RX from 'reactxp';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import TodosStore from '../stores/TodosStore';
 import NavContextStore from '../stores/NavContextStore';
 import ButtonParams from './ButtonParams';
@@ -103,7 +99,7 @@ export const CreateTodoHook = ({
   chartsPerRow = isTiny ? 2 : 2;
   chartSize = Math.min(width, 1024) / chartsPerRow;
 
-  chartStyle = [_styles.chart, { width: chartSize, height: chartSize * 0.8 }];
+  chartStyle = [_styles.chart, { flex: 1, }];
 
 
   const _isChanged = () => {
@@ -170,7 +166,7 @@ export const CreateTodoHook = ({
     if (imaginaryPartX.length > 0 && imaginaryPartY.length > 0) {
 
       let result = await Moralis.Cloud.run('LM', { partY: imaginaryPartY, partX: imaginaryPartX, a: undefined, iterMax: 1, NDone: 1, gridType: undefined, tol: undefined, lamdaInit: undefined, lamdaLow: undefined, lamdaHigh: undefined })
-      console.log(result)
+
       if (result) {
         let absorbanceReal = []
         for (let i = 0; i < result.dfImaginaryPartX.length; i++) {
@@ -199,11 +195,6 @@ export const CreateTodoHook = ({
         let transmissionImg = []
         for (let i = 0; i < result?.dfImaginaryPartY.length; i++) {
           transmissionImg.push({ x: result.imaginaryPartX[i], y: (1 - result.dfImaginaryPartY[i]) })
-
-        }
-        let arr7 = []
-        for (let i = 0; i < result.difference.length; i++) {
-          arr7.push({ x: result?.imaginaryPartX[i], y: result.difference[i] })
 
         }
         let dielectricFunctionImg = []
@@ -275,7 +266,7 @@ export const CreateTodoHook = ({
           reflectanceImg: [...reflectanceImg],
           transmissionReal: [...transmissionReal],
           transmissionImg: [...transmissionImg],
-          difference: [...arr7],
+          difference: [...result.difference],
           type: TodosStore.getType(),
           dielectricFunctionImg: [...dielectricFunctionImg],
           dielectricFunctionReal: [...dielectricFunctionReal],
@@ -300,7 +291,7 @@ export const CreateTodoHook = ({
     setCargando(true)
     if (imaginaryPartX.length > 0 && imaginaryPartY.length > 0) {
 
-      let result = new LM(imaginaryPartY, imaginaryPartX, undefined, 1, 1, undefined, undefined, undefined, undefined, undefined).fit();
+      let result = new LM(imaginaryPartY, imaginaryPartX, undefined, 5, 1, undefined, undefined, undefined, undefined, undefined).fit();
 
 
       let absorbanceReal = []
@@ -330,11 +321,6 @@ export const CreateTodoHook = ({
       let transmissionImg = []
       for (let i = 0; i < result?.dfImaginaryPartY.length; i++) {
         transmissionImg.push({ x: result.imaginaryPartX[i], y: (1 - result.dfImaginaryPartY[i]) })
-
-      }
-      let arr7 = []
-      for (let i = 0; i < result.difference.length; i++) {
-        arr7.push({ x: result?.imaginaryPartX[i], y: result.difference[i] })
 
       }
       let dielectricFunctionImg = []
@@ -406,7 +392,7 @@ export const CreateTodoHook = ({
         reflectanceImg: [...reflectanceImg],
         transmissionReal: [...transmissionReal],
         transmissionImg: [...transmissionImg],
-        difference: [...arr7],
+        difference: [...result.difference],
         type: TodosStore.getType(),
         dielectricFunctionImg: [...dielectricFunctionImg],
         dielectricFunctionReal: [...dielectricFunctionReal],
@@ -478,96 +464,103 @@ export const CreateTodoHook = ({
     reader.readAsText(blob);
     reader.onload = _loaded;
   }
+  const valores = {
+    labels: imaginaryPartX,
+    datasets: [
+      {
+        label: 'Reflectance Real',
+        data: imaginaryPartY,
+        fill: false,
+        backgroundColor: 'black',
+        borderColor: 'black',
+      },
+    ],
+  };
+
+  const options = {
+    responsive: true,
+    maintainAspectRatio: false,
+    scales: {
+      y: {
+        beginAtZero: true
+      }
+    },
+    pan: {
+      enabled: true,
+      mode: "xy"
+    },
+    zoom: {
+      enabled: true,
+      mode: "xy" // or 'x' for "drag" version
+    },
+  };
+  return <RX.View style={{ alignSelf: 'stretch', borderRadius: 12, flexDirection: isTiny ? 'column' : 'row', marginTop: 20, justifyContent: 'center', alignItems: 'center', flex: 1 }}>
 
 
-  return <RX.View style={[_styles.container, Styles.statusBarTopMargin, {
-
-    backgroundColor: isTiny ? '#2A285F' : undefined,
-
-    margin: 20,
-    alignSelf: 'center',
-    borderRadius: 12,
-    flexDirection: 'row'
-  }]}>
-
-
-    <RX.View style={{ borderRadius: 12, marginTop: 20, justifyContent: 'center', alignItems: 'center', height: chartSize, width: chartSize }}>
-
-      <RX.Text style={[_styles.text1, { alignSelf: isTiny ? 'center' : 'flex-start', textAlign: isTiny ? 'center' : 'left', fontSize: isTiny ? 24 : 32, marginBottom: 10, color: isTiny ? 'white' : 'black', }]} >
+    <RX.View style={{ paddingHorizontal: isTiny ? 40 : 0, justifyContent: 'center', alignItems: 'center', flexDirection: 'column', alignSelf: 'stretch', flex: 50, padding: 20 }}>
+      <RX.Text style={[_styles.text1, { alignSelf: isTiny ? 'center' : 'flex-start', textAlign: isTiny ? 'center' : 'left', fontSize: isTiny ? 24 : 32, marginBottom: 10, color: 'black', }]} >
         {'Create New Model'}
       </RX.Text>
       {cargado === true ?
         <RX.View style={chartStyle}>
-          <VictoryChart theme={VictoryTheme.material} height={chartSize * 0.8} width={chartSize} containerComponent={<VictoryZoomContainer />}>
-            <VictoryLine
-              interpolation="natural"
-              animate={{
-                duration: 2000,
-                onLoad: { duration: 1000 }
-              }}
-              style={{
-                data: { stroke: "#BC3DCB", strokeWidth: 3 },
-                parent: {
-                  border: "4px solid black",
-                }
-              }}
-              data={data}
-            />
-          </VictoryChart>
+          <Line data={valores} options={options} />
 
         </RX.View>
         :
-        <RX.View style={{ flex: 1, borderRadius: 12, borderColor: isTiny ? 'white' : 'black', borderStyle: 'dashed', justifyContent: 'center', alignItems: 'center', height: chartSize, width: chartSize, borderWidth: 2, }}>
+        <RX.View style={{ flex: 1, alignSelf: 'stretch', borderRadius: 12, borderColor: 'black', borderStyle: 'dashed', justifyContent: 'center', alignItems: 'center', borderWidth: 2, }}>
 
-          <Dropzone style={{ flex: 1, borderRadius: 12, width: chartSize, height: chartSize, justifyItems: 'center', alignItems: 'center', alignSelf: 'stretch', }}
+          <Dropzone style={{ flex: 1, borderRadius: 12, justifyItems: 'center', alignItems: 'center', alignSelf: 'stretch', }}
             onDrop={(files: any) => _onDropFile(files)}>
-            <RX.View style={{ justifyContent: 'center', alignItems: 'center', padding: 15, height: chartSize, width: chartSize }}>
-              <RX.Text style={{ color: isTiny ? 'white' : 'black', alignSelf: 'center' }}>{'Select Or Drag And Drop The Data File Here.'}
+            <RX.View style={{ justifyContent: 'center', alignItems: 'center', padding: 15, flex: 1, alignSelf: 'stretch' }}>
+              <RX.Text style={{ color: 'black', alignSelf: 'center' }}>{'Select Or Drag And Drop The Data File Here.'}
               </RX.Text>
             </RX.View>
           </Dropzone>
         </RX.View>
-      }</RX.View>
-    <RX.View style={{ flex: 1, borderRadius: 12, marginBottom: 20, marginTop: 40, padding: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+      }
 
 
-      <RX.View style={{ width: isTiny ? width * 0.9 : undefined, backgroundColor: '#2A285F', flexDirection: 'column', padding: isTiny ? 0 : 40, height: isTiny ? height * 0.60 : undefined, alignItems: isTiny ? 'center' : 'flex-start', justifyContent: isTiny ? 'center' : 'flex-start' }}>
+      <RX.Text style={[_styles.text2, { alignSelf: isTiny ? 'flex-start' : 'flex-start', marginTop: isTiny ? 8 : 12, marginBottom: isTiny ? 5 : 10, marginLeft: isTiny ? width * 0.10 : undefined }]} >
+        {'data points ' + imaginaryPartY.length}
+      </RX.Text>
+    </RX.View>
 
 
-        <RX.Text style={[_styles.text2, { alignSelf: isTiny ? 'flex-start' : 'flex-start', marginTop: isTiny ? 8 : 12, marginBottom: isTiny ? 5 : 10, marginLeft: isTiny ? width * 0.10 : undefined }]} >
-          {'Material name'}
-        </RX.Text>
-
-        <RX.Text style={[_styles.text2, { alignSelf: isTiny ? 'flex-start' : 'flex-start', marginTop: isTiny ? 8 : 12, marginBottom: isTiny ? 5 : 10, marginLeft: isTiny ? width * 0.10 : undefined }]} >
-          {'data points ' + imaginaryPartY.length}
-        </RX.Text>
-        <RX.TextInput onChangeText={setTitle}
-          accessibilityId={'EditTodoPanelTextInput'}
-          value={title}
-
-          style={[{ width: isTiny ? width * 0.70 : width * 0.24, height: isTiny ? 37 : 47, marginTop: 10, textAlign: 'center', backgroundColor: '#292558', borderRadius: 10, color: 'white' }]} placeholderTextColor={'#7877B1'} placeholder={'Nombre: Ej. Silicio'} />
-
-        <RX.Text style={[_styles.text2, { marginTop: isTiny ? 10 : 20, marginLeft: isTiny ? width * 0.10 : undefined, alignSelf: isTiny ? 'flex-start' : 'flex-start', marginBottom: isTiny ? 5 : 10 }]} >
-          {' Type of Measured'}
-        </RX.Text>
-        <ButtonParams isChanged={_isChanged} />
+    <RX.View style={{ flex: 50, paddingBottom: isTiny ? 20 : 0, alignSelf: 'stretch', flexDirection: 'column', borderRadius: 12, padding: isTiny ? 5 : 40, alignItems: isTiny ? 'center' : 'flex-start', justifyContent: isTiny ? 'flex-start' : 'flex-start' }}>
 
 
-        <RX.View style={_styles.buttonContainer}>
-          {cargando === false ? <SimpleButton disabled={(imaginaryPartY === [] ? true : false || changed || title === undefined ? true : false)} onPress={_onPressSave} text={'Analizar'} textStyle={_styles.text3} buttonStyle={{ borderWidth: 0, marginTop: isTiny ? 10 : 20, borderRadius: 11.48, backgroundColor: '#343261', width: isTiny ? width * 0.60 : width * 0.24, height: isTiny ? 37 : 47, justifyContent: 'center', alignItems: 'center' }} />
-            : null
-          }
-          {cargando === false ? <SimpleButton disabled={(imaginaryPartY === [] ? true : false || changed || title === undefined ? true : false)} onPress={_onPressSave2} text={'Analizar Yo'} textStyle={_styles.text3} buttonStyle={{ borderWidth: 0, marginTop: isTiny ? 10 : 20, borderRadius: 11.48, backgroundColor: '#343261', width: isTiny ? width * 0.60 : width * 0.24, height: isTiny ? 37 : 47, justifyContent: 'center', alignItems: 'center' }} />
-            : null
-          }
+      <RX.Text style={[_styles.text2, { alignSelf: isTiny ? 'flex-start' : 'flex-start', marginTop: isTiny ? 0 : 12, marginBottom: isTiny ? 5 : 10, marginLeft: isTiny ? width * 0.10 : undefined }]} >
+        {'Material name'}
+      </RX.Text>
+      <RX.TextInput onChangeText={setTitle}
+        accessibilityId={'EditTodoPanelTextInput'}
+        value={title}
 
-          <SimpleButton onPress={_onPressConfiguration} text={'Change Configuration'} textStyle={_styles.text3} buttonStyle={{ borderWidth: 0, marginTop: isTiny ? 10 : 20, borderRadius: 11.48, backgroundColor: '#343261', width: isTiny ? width * 0.60 : width * 0.24, height: isTiny ? 37 : 47, justifyContent: 'center', alignItems: 'center' }} />
+        style={[{ width: isTiny ? width * 0.70 : width * 0.24, height: isTiny ? 37 : 47, marginTop: 10, textAlign: 'center', backgroundColor: '#292558', borderRadius: 10, color: 'white' }]} placeholderTextColor={'#7877B1'} placeholder={'Nombre: Ej. Silicio'} />
 
-        </RX.View>
+      <RX.Text style={[_styles.text2, { marginTop: isTiny ? 10 : 20, marginLeft: isTiny ? width * 0.10 : undefined, alignSelf: isTiny ? 'flex-start' : 'flex-start', marginBottom: isTiny ? 5 : 10 }]} >
+        {' Type of Measured'}
+      </RX.Text>
+      <ButtonParams isChanged={_isChanged} />
+
+
+      <RX.View style={_styles.buttonContainer}>
+        {cargando === false ? <SimpleButton disabled={(imaginaryPartY === [] ? true : false || changed || title === undefined ? true : false)} onPress={_onPressSave} text={'Analizar'} textStyle={_styles.text3} buttonStyle={{ borderWidth: 0, marginTop: isTiny ? 10 : 20, borderRadius: 11.48, backgroundColor: '#343261', width: isTiny ? width * 0.60 : width * 0.24, height: isTiny ? 37 : 47, justifyContent: 'center', alignItems: 'center' }} />
+          : null
+        }
+        {cargando === false ? <SimpleButton disabled={(imaginaryPartY === [] ? true : false || changed || title === undefined ? true : false)} onPress={_onPressSave2} text={'Analizar Yo'} textStyle={_styles.text3} buttonStyle={{ borderWidth: 0, marginTop: isTiny ? 10 : 20, borderRadius: 11.48, backgroundColor: '#343261', width: isTiny ? width * 0.60 : width * 0.24, height: isTiny ? 37 : 47, justifyContent: 'center', alignItems: 'center' }} />
+          : null
+        }
+
+        <SimpleButton onPress={_onPressConfiguration} text={'Change Configuration'} textStyle={_styles.text3} buttonStyle={{ borderWidth: 0, marginTop: isTiny ? 10 : 20, borderRadius: 11.48, backgroundColor: '#343261', width: isTiny ? width * 0.60 : width * 0.24, height: isTiny ? 37 : 47, justifyContent: 'center', alignItems: 'center' }} />
       </RX.View>
 
     </RX.View>
+
+
   </RX.View>
+
+
 
 }
 

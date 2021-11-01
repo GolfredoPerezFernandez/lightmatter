@@ -433,6 +433,17 @@ function g(x, y){
         }
       }
     
+      for(let j=0;j<mfit;j++){     
+        if(!alpha[j]){
+          alpha[j]=[]
+      }
+
+      for(let k=0;k<=j;k++){
+          alpha[j][k]=0
+      }
+      beta[j]=0
+      }
+    
       chisq=0;
       
       for(let i=0;i<ndat;i++){

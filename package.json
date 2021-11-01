@@ -71,8 +71,9 @@
         "@stripe/stripe-js": "^1.17.1",
         "@types/react-stripe-elements": "^6.0.5",
         "@typescript-eslint/eslint-plugin": "^3.5.0",
-        "apollo-link-http": "^1.5.17",
         "axios": "^0.21.1",
+        "chart.js": "^3.6.0",
+        "chartjs": "^0.3.24",
         "email-validator": "^2.0.4",
         "eslint": "^7.4.0",
         "eslint-config-skype": "^1.7.0",
@@ -85,6 +86,7 @@
         "react": "^16.13.1",
         "react-audio-player": "^0.17.0",
         "react-bell-chat": "^1.0.49",
+        "react-chartjs-2": "^3.3.0",
         "react-cloudinary-upload-widget": "^1.4.3",
         "react-dom": "^16.13.1",
         "react-dropzone": "^5.1.1",
@@ -107,7 +109,6 @@
         "synctasks": "^0.3.3",
         "three": "^0.129.0",
         "use-cloudinary": "^4.1.0",
-        "use-debounce": "^7.0.0",
-        "victory": "^36.0.1"
+        "use-debounce": "^7.0.0"
     }
 }
