@@ -42,6 +42,8 @@ export interface Todo {
     impedanceReal:Data[],
     impedanceImg:Data[],
     difference:number[];
+    termalReal:Data[],
+    termalImg:Data[],
     refractionIndex:Data[],
     extincionCoef:Data[],
     type:string;

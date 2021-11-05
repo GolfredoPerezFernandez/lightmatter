@@ -19,13 +19,13 @@ interface AccountMenuButtonState {
     currentUserName: string;
     isHovering: boolean;
     command: string;
-    isTiny:boolean
-    
+    isTiny: boolean
+
 }
 interface AccountMenuButtonProps {
-    isChanged?:(type?:string)=>void;
-    type?:string
-    
+    isChanged: (type: string) => void;
+    type?: string
+
 }
 
 
@@ -63,9 +63,9 @@ const _styles = {
         borderColor: Colors.menuTextHover,
     }),
     text3: RX.Styles.createTextStyle({
-        font:Fonts.displayBold,
-        fontSize:13,
-        color:'white',
+        font: Fonts.displayBold,
+        fontSize: 13,
+        color: 'white',
     }),
 };
 
@@ -74,11 +74,11 @@ import TodosStore from '../stores/TodosStore';
 export default class ButtonParams extends ComponentBase<AccountMenuButtonProps, AccountMenuButtonState> {
     private _mountedButton: any;
 
-    protected _buildState(props:AccountMenuButtonProps, initState: boolean): Partial<AccountMenuButtonState> | undefined {
+    protected _buildState(props: AccountMenuButtonProps, initState: boolean): Partial<AccountMenuButtonState> | undefined {
         const partialState: Partial<AccountMenuButtonState> = {
             currentUserName: CurrentUserStore.getFullName(),
-            command:'Select an type of measurement',
-            isTiny:ResponsiveWidthStore.isSmallOrTinyScreenSize(),     
+            command: 'Select an type of measurement',
+            isTiny: ResponsiveWidthStore.isSmallOrTinyScreenSize(),
         };
 
         return partialState;
@@ -86,10 +86,10 @@ export default class ButtonParams extends ComponentBase<AccountMenuButtonProps, 
 
     render(): JSX.Element | null {
         return (
-                      <SimpleButtonParams   ref={ this._onMountButton }
-                onPress={ this._onPress }
-                 text={this.props.type?this.props.type:this.command} textStyle={_styles.text3} buttonStyle={[{justifyContent:'center',borderWidth:0,alignItems:'center',width:320,height:this.state.isTiny?37:47,marginTop:0,backgroundColor:'#292558',borderRadius:10}]} />
-                           
+            <SimpleButtonParams ref={this._onMountButton}
+                onPress={this._onPress}
+                text={this.command} textStyle={_styles.text3} buttonStyle={[{ justifyContent: 'center', borderWidth: 0, alignItems: 'center', width: 320, height: this.state.isTiny ? 37 : 47, marginTop: 0, backgroundColor: '#292558', borderRadius: 10 }]} />
+
         );
     }
 
@@ -99,7 +99,7 @@ export default class ButtonParams extends ComponentBase<AccountMenuButtonProps, 
 
     private _onPress = (e: RX.Types.SyntheticEvent) => {
         e.stopPropagation();
-        
+
         RX.Popup.show({
             getAnchor: () => this._mountedButton,
             getElementTriggeringPopup: () => this._mountedButton,
@@ -113,37 +113,37 @@ export default class ButtonParams extends ComponentBase<AccountMenuButtonProps, 
                 }, {
                     command: 'Transmission',
                     text: 'Transmission',
-                },{
+                }, {
                     command: 'Dielectric Function',
                     text: 'Dielectric Function',
-                },{
+                }, {
                     command: 'Electrical Conductivity',
                     text: 'Electrical Conductivity',
-                },{
+                }, {
                     command: 'Termal Conductivity',
                     text: 'Termal Conductivity',
-                },{
+                }, {
                     command: 'Refraction Index',
                     text: 'Refraction Index',
-                },{
+                }, {
                     command: 'Impedance',
                     text: 'Impedance',
                 }];
 
                 return (
                     <SimpleMenuParams
-                        menuItems={ items }
-                        onSelectItem={ this._onSelectMenuItem }
+                        menuItems={items}
+                        onSelectItem={this._onSelectMenuItem}
                     />
                 );
             },
             dismissIfShown: true,
         }, _menuPopupId);
     };
-command='Select an type of measurement'
+    command = 'Select an type of measurement'
     private _onSelectMenuItem = (command: string) => {
-        this.command=command
-        if(this.props.isChanged){
+        this.command = command
+        if (this.props.isChanged) {
             this.props.isChanged(command);
         }
         TodosStore.setType(command);

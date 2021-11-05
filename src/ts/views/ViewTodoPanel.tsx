@@ -27,11 +27,11 @@ interface ViewTodoPanelState {
     todo: Todo; zoomDomain: number; selectedDomain: number;
     arr1: Data[];
     arr2: Data[];
+    type: string;
     width: number;
     height: number;
     isTiny: boolean;
     arr3: Data[];
-    type: string;
 }
 
 const _styles = {
@@ -71,6 +71,7 @@ const _styles = {
 
 import * as _ from 'lodash';
 import ResponsiveWidthStore from '../stores/ResponsiveWidthStore';
+import CurrentUserStore from '../stores/CurrentUserStore';
 export default class ViewTodoPanel extends ComponentBase<ViewTodoPanelProps, ViewTodoPanelState> {
 
 
@@ -84,6 +85,7 @@ export default class ViewTodoPanel extends ComponentBase<ViewTodoPanelProps, Vie
             width: ResponsiveWidthStore.getWidth(),
             height: ResponsiveWidthStore.getHeight(),
             isTiny: ResponsiveWidthStore.isSmallOrTinyScreenSize(),
+            type: CurrentUserStore.getType()
         };
         return newState;
     }
@@ -111,6 +113,13 @@ export default class ViewTodoPanel extends ComponentBase<ViewTodoPanelProps, Vie
             },
         }
     };
+
+    _isChanged = (type: string) => {
+        CurrentUserStore.setType(type)
+        console.log(this.state.type)
+    }
+
+
     render() {
 
         let chartsPerRow2 = this.state.isTiny ? 2.2 : 2.5;
@@ -125,7 +134,7 @@ export default class ViewTodoPanel extends ComponentBase<ViewTodoPanelProps, Vie
                         {this.state.todo.title}
                     </RX.Text>
                     <RX.View style={{ flex: 1, justifyContent: 'center', alignItems: this.state.isTiny ? 'flex-end' : 'flex-end', alignSelf: this.state.isTiny ? 'center' : 'flex-start' }}>
-                        <ButtonParams type={this.type} />
+                        <ButtonParams isChanged={this._isChanged} type={this.type} />
                     </RX.View>
 
                 </RX.View>
@@ -138,7 +147,7 @@ export default class ViewTodoPanel extends ComponentBase<ViewTodoPanelProps, Vie
                             datasets: [
                                 {
                                     label: 'Real modelated',
-                                    data: this.state.todo.dfImaginaryPartY,
+                                    data: this.state.type === '' ? this.state.todo.dfImaginaryPartY : this.state.type === 'Dielectric Function' ? this.state.todo.dielectricFunctionReal : this.state.type === 'Electrical Conductivity' ? this.state.todo.conductivityReal : this.state.type === 'Refraction Index' ? this.state.todo.refractionIndex : this.state.type === 'Reflectance' ? this.state.todo.reflectanceImg : this.state.type === 'Absorbance' ? this.state.todo.absorbanceReal : this.state.type === 'Transmission' ? this.state.todo.transmissionReal : this.state.type === 'Termal Conductivity' ? this.state.todo.termalReal : this.state.type === 'Impedance' ? this.state.todo.impedanceReal : null,
                                     fill: false,
                                     backgroundColor: 'blue',
                                     borderColor: 'blue',
@@ -147,20 +156,13 @@ export default class ViewTodoPanel extends ComponentBase<ViewTodoPanelProps, Vie
 
                                 {
                                     label: 'Real original',
-                                    data: this.state.todo.imaginaryPartY,
+                                    data: this.state.type === '' ? this.state.todo.imaginaryPartY : null,
                                     fill: false,
                                     backgroundColor: 'black',
                                     borderColor: 'black',
                                     pointRadius: 1
                                 },
-                                {
-                                    label: 'difference',
-                                    data: this.state.todo.difference,
-                                    fill: false,
-                                    backgroundColor: 'rgb(255, 99, 132)',
-                                    borderColor: 'rgb(255, 99, 132)',
-                                    pointRadius: 1
-                                },
+
                             ],
                         }}
                             options={this.options} />
@@ -174,7 +176,7 @@ export default class ViewTodoPanel extends ComponentBase<ViewTodoPanelProps, Vie
                             datasets: [
                                 {
                                     label: 'Imaginary modelated ',
-                                    data: this.state.todo.dfRealPartY,
+                                    data: this.state.type === '' ? this.state.todo.dfRealPartY : this.state.type === 'Dielectric Function' ? this.state.todo.dielectricFunctionImg : this.state.type === 'Electrical Conductivity' ? this.state.todo.conductivityImg : this.state.type === 'Refraction Index' ? this.state.todo.extincionCoef : this.state.type === 'Reflectance' ? this.state.todo.reflectanceReal : this.state.type === 'Absorbance' ? this.state.todo.absorbanceImg : this.state.type === 'Transmission' ? this.state.todo.transmissionImg : this.state.type === 'Termal Conductivity' ? this.state.todo.termalImg : this.state.type === 'Impedance' ? this.state.todo.impedanceImg : null,
                                     fill: false,
                                     backgroundColor: 'red',
                                     borderColor: 'rgba(255, 99, 132, 0.2)',

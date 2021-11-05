@@ -19,6 +19,17 @@ export class CurrentUserStore extends StoreBase {
     };
     private _isLogin: boolean = false
 
+    private _type: string = ''
+
+    setType(type: string) {
+        this._type=type
+        this.trigger();
+
+    }
+    @autoSubscribe
+    getType(): string {
+        return this._type;
+    }
     @autoSubscribe
     getLogin(): boolean {
         return this._isLogin;

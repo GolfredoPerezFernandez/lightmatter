@@ -1,5 +1,5 @@
 
-import { Fonts, FontSizes, Styles } from '../app/Styles';
+import { Fonts, FontSizes } from '../app/Styles';
 
 
 const Moralis = require('moralis');
@@ -58,14 +58,14 @@ const _styles = {
   text4: RX.Styles.createTextStyle({
     font: Fonts.displayBold,
     fontSize: 13,
-    color: 'black',
+    color: 'white',
   }),
 };
 
 
 import Dropzone from 'react-dropzone';
 import * as RX from 'reactxp';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import TodosStore from '../stores/TodosStore';
 import NavContextStore from '../stores/NavContextStore';
 import ButtonParams from './ButtonParams';
@@ -73,6 +73,7 @@ import SimpleButton from '../controls/SimpleButton';
 import SimpleDialogConfig from '../controls/SimpleDialogConfig';
 import LM from './LM';
 import { Todo } from '../models/TodoModels';
+import * as NumericInput from "react-numeric-input";
 
 const _confirmDeleteDialogId = 'config';
 export const CreateTodoHook = ({
@@ -84,26 +85,27 @@ export const CreateTodoHook = ({
   height: number,
   isTiny: boolean
 }) => {
+  var [type, setType] = useState('')
   var [title, setTitle] = useState('')
+  var [NDONE, setNDONE] = useState<any>(1)
+  var [lamdaH, setLamdaH] = useState<any>(10)
+  var [lamdaL, setLamdaL] = useState<any>(0.001)
+  var [lamdaI, setLamdaI] = useState<any>(0.1)
+  var [tol, setTol] = useState<any>(0.01)
+  var [iterMax, setIterMax] = useState<any>(5)
   var [cargando, setCargando] = useState(false)
   var [cargado, setCargado] = useState(false)
-  var [changed, setChanged] = useState(false)
-  var [data, setData] = useState<any[]>([])
   var [imaginaryPartY, setImaginaryPartY] = useState<any[]>([])
   var [imaginaryPartX, setImaginaryPartX] = useState<any[]>([])
 
-  var chartsPerRow = 0;
-  var chartSize = 0;
   var chartStyle;
 
-  chartsPerRow = isTiny ? 2 : 2;
-  chartSize = Math.min(width, 1024) / chartsPerRow;
 
   chartStyle = [_styles.chart, { flex: 1, }];
 
 
-  const _isChanged = () => {
-    setChanged(false)
+  const _isChanged = (type: string) => {
+    setType(type)
   }
 
 
@@ -116,30 +118,69 @@ export const CreateTodoHook = ({
         dialogId={_confirmDeleteDialogId}
         text={'Are you sure you want to delete this todo?'}
         children={
-          <RX.View style={{ justifyContent: 'center', alignItems: 'center', flex: 1 }}>
+          <RX.View style={{ alignSelf: 'stretch', justifyContent: 'center', alignItems: 'center', flex: 1 }}>
 
             <RX.Text style={[_styles.text4, { marginTop: 20, textAlign: 'center', marginBottom: 10 }]} >
               {'Analisis Configuration'}
             </RX.Text>
-            <RX.View style={{ flex: 1, width: 400, justifyContent: 'center', alignItems: 'flex-start' }}>
-              <RX.Text style={[_styles.text4, { marginTop: 20, textAlign: 'left', marginBottom: 10 }]} >
-                {'Iteraciones Maximas'}
-              </RX.Text>
-              <RX.Text style={[_styles.text4, { marginTop: 20, textAlign: 'left', marginBottom: 10 }]} >
-                {'Iteraciones Exitosas'}
-              </RX.Text>
-              <RX.Text style={[_styles.text4, { marginTop: 20, textAlign: 'left', marginBottom: 10 }]} >
-                {'tolerancia'}
-              </RX.Text>
-              <RX.Text style={[_styles.text4, { marginTop: 20, textAlign: 'left', marginBottom: 10 }]} >
-                {'Lamda Inicial'}
-              </RX.Text>
-              <RX.Text style={[_styles.text4, { marginTop: 20, textAlign: 'left', marginBottom: 10 }]} >
-                {'Lamda Low'}
-              </RX.Text>
-              <RX.Text style={[_styles.text4, { marginTop: 20, textAlign: 'left', marginBottom: 10 }]} >
-                {'Lamda High'}
-              </RX.Text>
+            <RX.View style={{ flex: 1, alignSelf: 'stretch', justifyContent: 'center', alignItems: 'flex-start' }}>
+              <RX.View style={{ height: 47, marginTop: 10, marginBottom: 10, flex: 1, alignSelf: 'stretch', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+                <RX.Text style={[_styles.text4, { marginRight: 30, textAlign: 'left', }]} >
+                  {'Iteraciones Maximas'}
+                </RX.Text>
+                <NumericInput height={34} size={5} snap step={1} min={1} max={10000} onChange={setIterMax} value={iterMax} />
+
+
+              </RX.View>
+              <RX.View style={{ height: 47, marginTop: 10, marginBottom: 10, flex: 1, alignSelf: 'stretch', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+
+                <RX.Text style={[_styles.text4, { marginRight: 30, textAlign: 'left', }]} >
+                  {'Iteraciones Exitosas'}
+                </RX.Text>
+
+                <NumericInput height={34} size={5} snap step={1} min={1} max={1000} onChange={setNDONE} value={NDONE} />
+
+
+
+              </RX.View>
+              <RX.View style={{ height: 47, marginTop: 10, marginBottom: 10, flex: 1, alignSelf: 'stretch', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+                <RX.Text style={[_styles.text4, { marginRight: 30, textAlign: 'left', }]} >
+                  {'tolerancia'}
+                </RX.Text>
+
+                <NumericInput height={34} size={5} snap step={0.01} min={0.001} max={10} onChange={setTol} value={tol} />
+
+
+              </RX.View>
+              <RX.View style={{ height: 47, marginTop: 10, marginBottom: 10, flex: 1, alignSelf: 'stretch', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+
+                <RX.Text style={[_styles.text4, { marginRight: 30, textAlign: 'left', }]} >
+                  {'Lamda Inicial'}
+                </RX.Text>
+
+                <NumericInput height={34} size={5} snap step={0.001} min={0.001} max={10} onChange={setLamdaI} value={lamdaI} />
+
+
+              </RX.View>
+              <RX.View style={{ height: 47, marginTop: 10, marginBottom: 10, flex: 1, alignSelf: 'stretch', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+
+                <RX.Text style={[_styles.text4, { marginRight: 30, textAlign: 'left', }]} >
+                  {'Lamda Low'}
+                </RX.Text>
+                <NumericInput height={34} size={5} snap step={0.1} min={0.0001} max={10} onChange={setLamdaL} value={lamdaL} />
+
+
+              </RX.View>
+              <RX.View style={{ height: 47, marginTop: 10, marginBottom: 10, flex: 1, alignSelf: 'stretch', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+
+                <RX.Text style={[_styles.text4, { marginRight: 30, textAlign: 'left', }]} >
+                  {'Lamda High'}
+                </RX.Text>
+                <NumericInput height={34} size={5} snap step={1} min={1} max={100} onChange={setLamdaH} value={lamdaH} />
+
+
+
+              </RX.View>
             </RX.View>
           </RX.View>
         }
@@ -165,7 +206,7 @@ export const CreateTodoHook = ({
     setCargando(true)
     if (imaginaryPartX.length > 0 && imaginaryPartY.length > 0) {
 
-      let result = await Moralis.Cloud.run('LM', { partY: imaginaryPartY, partX: imaginaryPartX, a: undefined, iterMax: 1, NDone: 1, gridType: undefined, tol: undefined, lamdaInit: undefined, lamdaLow: undefined, lamdaHigh: undefined })
+      let result = await Moralis.Cloud.run('LM', { partY: imaginaryPartY, partX: imaginaryPartX, a: undefined, iterMax, NDone: NDONE, gridType: undefined, tol, lamdaInit: lamdaI, lamdaLow: lamdaL, lamdaHigh: lamdaH })
 
       if (result) {
         let absorbanceReal = []
@@ -274,6 +315,8 @@ export const CreateTodoHook = ({
           conductivityImg: [...conductivityImg],
           impedanceReal: [...ImpedanceReal],
           impedanceImg: [...ImpedanceImg],
+          termalReal: [...ImpedanceReal],
+          termalImg: [...ImpedanceImg],
           refractionIndex: [...refractionIndex],
           extincionCoef: [...exticionCoef]
         };
@@ -291,7 +334,7 @@ export const CreateTodoHook = ({
     setCargando(true)
     if (imaginaryPartX.length > 0 && imaginaryPartY.length > 0) {
 
-      let result = new LM(imaginaryPartY, imaginaryPartX, undefined, 5, 1, undefined, undefined, undefined, undefined, undefined).fit();
+      let result = new LM(imaginaryPartY, imaginaryPartX, undefined, iterMax, NDONE, undefined, tol, lamdaI, lamdaL, lamdaH).fit();
 
 
       let absorbanceReal = []
@@ -400,6 +443,8 @@ export const CreateTodoHook = ({
         conductivityImg: [...conductivityImg],
         impedanceReal: [...ImpedanceReal],
         impedanceImg: [...ImpedanceImg],
+        termalReal: [...ImpedanceReal],
+        termalImg: [...ImpedanceImg],
         refractionIndex: [...refractionIndex],
         extincionCoef: [...exticionCoef]
       };
@@ -446,7 +491,6 @@ export const CreateTodoHook = ({
     for (let i = 0; i < yAxis.length; i++) {
       arr.push({ x: xAxis[i], y: yAxis[i] })
     }
-    setData([...arr]);
     await TodosStore.setPartY([...yAxis])
     await TodosStore.setPartX([...xAxis])
 
@@ -545,10 +589,10 @@ export const CreateTodoHook = ({
 
 
       <RX.View style={_styles.buttonContainer}>
-        {cargando === false ? <SimpleButton disabled={(imaginaryPartY === [] ? true : false || changed || title === undefined ? true : false)} onPress={_onPressSave} text={'Analizar'} textStyle={_styles.text3} buttonStyle={{ borderWidth: 0, marginTop: isTiny ? 10 : 20, borderRadius: 11.48, backgroundColor: '#343261', width: isTiny ? width * 0.60 : width * 0.24, height: isTiny ? 37 : 47, justifyContent: 'center', alignItems: 'center' }} />
+        {cargando === false ? <SimpleButton disabled={(imaginaryPartY.length > 500 ? true : false || title === '' || type === '' ? true : false)} onPress={_onPressSave} text={'Analizar en Servidor'} textStyle={_styles.text3} buttonStyle={{ borderWidth: 0, marginTop: isTiny ? 10 : 20, borderRadius: 11.48, backgroundColor: '#343261', width: isTiny ? width * 0.60 : width * 0.24, height: isTiny ? 37 : 47, justifyContent: 'center', alignItems: 'center' }} />
           : null
         }
-        {cargando === false ? <SimpleButton disabled={(imaginaryPartY === [] ? true : false || changed || title === undefined ? true : false)} onPress={_onPressSave2} text={'Analizar Yo'} textStyle={_styles.text3} buttonStyle={{ borderWidth: 0, marginTop: isTiny ? 10 : 20, borderRadius: 11.48, backgroundColor: '#343261', width: isTiny ? width * 0.60 : width * 0.24, height: isTiny ? 37 : 47, justifyContent: 'center', alignItems: 'center' }} />
+        {cargando === false ? <SimpleButton disabled={(imaginaryPartY.length == 0 ? true : false || title === '' || type === '' ? true : false)} onPress={_onPressSave2} text={'Analizar en mi Pc'} textStyle={_styles.text3} buttonStyle={{ borderWidth: 0, marginTop: isTiny ? 10 : 20, borderRadius: 11.48, backgroundColor: '#343261', width: isTiny ? width * 0.60 : width * 0.24, height: isTiny ? 37 : 47, justifyContent: 'center', alignItems: 'center' }} />
           : null
         }
 
